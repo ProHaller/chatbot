@@ -3,15 +3,9 @@ import os
 import json
 import time
 import streamlit as st
-from dotenv import load_dotenv
 from openai import OpenAI
 
-load_dotenv()
-
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_ORG = os.getenv("OPENAI_ORG")
-openai.api_key = OPENAI_API_KEY
-
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 # Import necessary libraries
 
 # Initialize OpenAI client with your API key
