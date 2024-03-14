@@ -10,7 +10,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Initialize OpenAI client with your API key
 client = OpenAI(
-    api_key=openai,
+    api_key=openai.api_key,
 )
 
 
