@@ -15,7 +15,7 @@ client = OpenAI(
 
 
 # Function to get the response from a thread
-def get_response(thread):
+def get_response():
     """
     This function retrieves the messages from a thread in ascending order.
     Parameters:
@@ -87,8 +87,6 @@ def main():
     if "thread_id" not in st.session_state:
         st.session_state.thread_id = thread.id
 
-    # Rest of the code...
-
     # Display chat messages from history
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -107,18 +105,21 @@ def main():
 
         # Send user input to the chatbot and get response
         run = wait_on_run(send_and_run(user_input))
-        response = get_response(thread)
+        response = get_response()
 
         # Display assistant's response
+        assistant_response = ""
         for message in response.data:
             if message.role == "assistant":
                 for content in message.content:
                     if content.type == "text":
-                        with st.chat_message("assistant"):
-                            st.markdown(content.text.value)
-                        st.session_state.messages.append(
-                            {"role": "assistant", "content": content.text.value}
-                        )
+                        assistant_response += content.text.value + "\n"
+        if assistant_response:
+            with st.chat_message("assistant"):
+                st.markdown(assistant_response)
+            st.session_state.messages.append(
+                {"role": "assistant", "content": assistant_response}
+            )
 
 
 if __name__ == "__main__":
