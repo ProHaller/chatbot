@@ -87,8 +87,8 @@ def main():
     if "thread_id" not in st.session_state:
         st.session_state.thread_id = thread.id
 
-    # Display chat messages from history
-    for message in st.session_state.messages:
+    # Display chat messages from history, excluding the last assistant response
+    for message in st.session_state.messages[:-1]:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
@@ -128,6 +128,14 @@ def main():
                 st.session_state.messages.append(
                     {"role": "assistant", "content": assistant_response.strip()}
                 )
+
+    # Display the last assistant response
+    if (
+        st.session_state.messages
+        and st.session_state.messages[-1]["role"] == "assistant"
+    ):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.messages[-1]["content"])
 
 
 if __name__ == "__main__":
