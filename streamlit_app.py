@@ -10,7 +10,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Initialize OpenAI client with your API key
 client = OpenAI(
-    api_key=openai.api_key,
+    api_key=openai,
 )
 
 
@@ -21,7 +21,9 @@ def get_response(thread):
     Parameters:
     thread (Thread): The thread to retrieve messages from.
     """
-    return client.beta.threads.messages.list(thread_id=thread.id, order="asc")
+    return client.beta.threads.messages.list(
+        thread_id=st.session_state.thread_id, order="asc"
+    )
 
 
 # Function to create a thread
@@ -41,13 +43,13 @@ def send_and_run(content):
     content (str): The content of the message to send.
     """
     message = client.beta.threads.messages.create(
-        thread_id=thread.id,
+        thread_id=st.session_state.thread_id,
         role="user",
         content=content,
     )
 
     return client.beta.threads.runs.create(
-        thread_id=thread.id,
+        thread_id=st.session_state.thread_id,
         assistant_id=assistant.id,
     )
 
@@ -81,9 +83,13 @@ def main():
     st.set_page_config(page_title="Chatbot App", page_icon=":robot_face:")
     st.title("Chatbot App")
 
-    # Initialize chat history
+    # Initialize chat history and thread ID
     if "messages" not in st.session_state:
         st.session_state.messages = []
+    if "thread_id" not in st.session_state:
+        st.session_state.thread_id = thread.id
+
+    # Rest of the code...
 
     # Display chat messages from history
     for message in st.session_state.messages:
