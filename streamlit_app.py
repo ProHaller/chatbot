@@ -113,16 +113,21 @@ def main():
             if message.role == "assistant":
                 for content in message.content:
                     if content.type == "text":
-                        assistant_response = content.text.value
-                        break
-                break
+                        assistant_response += content.text.value + "\n"
 
         if assistant_response:
             with st.chat_message("assistant"):
                 st.markdown(assistant_response)
-            st.session_state.messages.append(
-                {"role": "assistant", "content": assistant_response}
-            )
+            # Update the last assistant response in the chat history
+            if (
+                st.session_state.messages
+                and st.session_state.messages[-1]["role"] == "assistant"
+            ):
+                st.session_state.messages[-1]["content"] = assistant_response.strip()
+            else:
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": assistant_response.strip()}
+                )
 
 
 if __name__ == "__main__":
