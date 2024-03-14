@@ -87,16 +87,17 @@ def main():
     if "thread_id" not in st.session_state:
         st.session_state.thread_id = thread.id
 
+    # Display the chat history
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
     # Get user input
     user_input = st.chat_input("You:")
 
     if user_input:
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": user_input})
-
-        # Display user message immediately
-        with st.chat_message("user"):
-            st.markdown(user_input)
 
         # Send user input to the chatbot and get response
         run = wait_on_run(send_and_run(user_input))
@@ -118,11 +119,6 @@ def main():
             st.session_state.messages.append(
                 {"role": "assistant", "content": last_assistant_response}
             )
-
-    # Display the chat history
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
 
 
 if __name__ == "__main__":
