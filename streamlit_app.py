@@ -114,18 +114,15 @@ def main():
                 break
 
         if last_assistant_response:
-            with st.chat_message("assistant"):
-                st.markdown(last_assistant_response)
             # Update the last assistant response in the chat history
             st.session_state.messages.append(
                 {"role": "assistant", "content": last_assistant_response}
             )
 
-    # Display the last message in the chat history
-    if st.session_state.messages:
-        last_message = st.session_state.messages[-1]
-        with st.chat_message(last_message["role"]):
-            st.markdown(last_message["content"])
+    # Display the chat history
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
 
 if __name__ == "__main__":
