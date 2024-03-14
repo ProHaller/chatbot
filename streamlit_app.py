@@ -55,21 +55,19 @@ def send_and_run(content):
 
 
 # Function to wait for a run to finish
-# OpenAI says streaming support coming "soon"
 def wait_on_run(run):
-    """
-    This function waits for a run to finish.
-    Parameters:
-    run (Run): The run to wait for.
-    """
     while run.status == "queued" or run.status == "in_progress":
-        run = client.beta.threads.runs.retrieve(
-            thread_id=thread.id,
-            run_id=run.id,
-        )
-
-        print(run.status)
-        time.sleep(0.5)
+        try:
+            run = client.beta.threads.runs.retrieve(
+                thread_id=st.session_state.thread_id,
+                run_id=run.id,
+            )
+            print(run.status)
+            time.sleep(0.5)
+        except openai.NotFoundError:
+            # If the run is not found, create a new run
+            run = send_and_run(st.session_state.messages[-1]["content"])
+            print("Created new run:", run.id)
     return run
 
 
