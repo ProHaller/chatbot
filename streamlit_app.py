@@ -101,22 +101,24 @@ def main():
         # Send user input to the chatbot and get response
         run = wait_on_run(send_and_run(user_input))
         response = get_response()
-        st.write(response)
 
-        # Display assistant's response
-        assistant_response = ""
-        for message in response.data:
+        # Find the last assistant response
+        last_assistant_response = None
+        for message in reversed(response.data):
             if message.role == "assistant":
                 for content in message.content:
                     if content.type == "text":
-                        assistant_response += content.text.value + "\n"
+                        last_assistant_response = content.text.value
+                        break
+            if last_assistant_response:
+                break
 
-        if assistant_response:
+        if last_assistant_response:
             with st.chat_message("assistant"):
-                st.markdown(assistant_response)
+                st.markdown(last_assistant_response)
             # Update the last assistant response in the chat history
             st.session_state.messages.append(
-                {"role": "assistant", "content": assistant_response.strip()}
+                {"role": "assistant", "content": last_assistant_response}
             )
 
     # Display the last message in the chat history
