@@ -87,10 +87,8 @@ def main():
     if "thread_id" not in st.session_state:
         st.session_state.thread_id = thread.id
 
-    # Display the chat history
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    # Create a container for the chat history
+    chat_container = st.container()
 
     # Get user input
     user_input = st.chat_input("You:")
@@ -119,6 +117,12 @@ def main():
             st.session_state.messages.append(
                 {"role": "assistant", "content": last_assistant_response}
             )
+
+    # Display the chat history in the container
+    with chat_container:
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
 
 if __name__ == "__main__":
