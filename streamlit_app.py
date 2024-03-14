@@ -108,18 +108,15 @@ def main():
         response = get_response()
 
         # Display assistant's response
-        assistant_response = ""
         for message in response.data:
             if message.role == "assistant":
                 for content in message.content:
                     if content.type == "text":
-                        assistant_response += content.text.value + "\n"
-        if assistant_response:
-            with st.chat_message("assistant"):
-                st.markdown(assistant_response)
-            st.session_state.messages.append(
-                {"role": "assistant", "content": assistant_response.strip()}
-            )
+                        with st.chat_message("assistant"):
+                            st.markdown(content.text.value)
+                        st.session_state.messages.append(
+                            {"role": "assistant", "content": content.text.value}
+                        )
 
 
 if __name__ == "__main__":
