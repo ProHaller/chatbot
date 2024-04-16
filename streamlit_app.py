@@ -88,9 +88,6 @@ def main():
     user_input = st.chat_input("You:")
 
     if user_input:
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": user_input})
-
         try:
             # Send user input to the chatbot and get response
             run = send_and_run(user_input)
@@ -99,14 +96,17 @@ def main():
 
             # Find the last assistant response
             last_assistant_response = None
-            for message in reversed(response.data):
-                if message.role == "assistant":
+            for message in response.data:
+                if message.role == "user":
+                    # Add user message to chat history
+                    st.session_state.messages.append(
+                        {"role": "user", "content": message.content}
+                    )
+                elif message.role == "assistant":
                     for content in message.content:
                         if content.type == "text":
                             last_assistant_response = content.text.value
                             break
-                if last_assistant_response:
-                    break
 
             if last_assistant_response:
                 # Update the last assistant response in the chat history
