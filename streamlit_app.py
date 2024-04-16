@@ -72,7 +72,7 @@ def wait_on_run(run):
 
 
 # Create an assistant and thread
-assistant = client.beta.assistants.retrieve("asst_LoGW78zvPyUR8o3NqNAo66h7")
+assistant = client.beta.assistants.retrieve("asst_mLDWK2HsrZIK76mXL8xeFtHZ")
 thread = create_thread()
 
 
