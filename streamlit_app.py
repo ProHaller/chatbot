@@ -48,7 +48,7 @@ thread = create_thread()
 
 def main():
     st.set_page_config(page_title="Chatbot App", page_icon=":robot_face:")
-    st.title("Chatbot App")
+    st.title("Relationship Design Chatbot")
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -56,7 +56,7 @@ def main():
         st.session_state.thread_id = thread.id
 
     chat_container = st.container()
-    user_input = st.chat_input("You:")
+    user_input = st.chat_input("Write your message here:")
 
     if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
