@@ -1,6 +1,4 @@
 import openai
-import os
-import json
 import time
 import streamlit as st
 from openai import OpenAI
@@ -36,7 +34,6 @@ def create_thread():
     return thread
 
 
-@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=1, max=10))
 def send_and_run(content):
     """
     This function sends a message to the thread and runs it.
@@ -55,13 +52,19 @@ def send_and_run(content):
     )
 
 
-# Function to wait for a run to finish
-@retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=1, min=1, max=10))
 def wait_on_run(run):
-    run = client.beta.threads.runs.retrieve(
-        thread_id=st.session_state.thread_id,
-        run_id=run.id,
-    )
+    while run.status == "queued" or run.status == "in_progress":
+        try:
+            run = client.beta.threads.runs.retrieve(
+                thread_id=st.session_state.thread_id,
+                run_id=run.id,
+            )
+            print(run.status)
+            time.sleep(0.5)
+        except openai.NotFoundError:
+            # If the run is not found, create a new run
+            run = send_and_run(st.session_state.messages[-1]["content"])
+            print("Created new run:", run.id)
     return run
 
 
@@ -91,33 +94,26 @@ def main():
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": user_input})
 
-        with st.spinner("Generating response..."):
-            try:
-                # Send user input to the chatbot and get response
-                run = send_and_run(user_input)
-                run = wait_on_run(run)
-                response = get_response()
+        # Send user input to the chatbot and get response
+        run = wait_on_run(send_and_run(user_input))
+        response = get_response()
 
-                # Find the last assistant response
-                last_assistant_response = None
-                for message in reversed(response.data):
-                    if message.role == "assistant":
-                        for content in message.content:
-                            if content.type == "text":
-                                last_assistant_response = content.text.value
-                                break
-                    if last_assistant_response:
+        # Find the last assistant response
+        last_assistant_response = None
+        for message in reversed(response.data):
+            if message.role == "assistant":
+                for content in message.content:
+                    if content.type == "text":
+                        last_assistant_response = content.text.value
                         break
+            if last_assistant_response:
+                break
 
-                if last_assistant_response:
-                    # Update the last assistant response in the chat history
-                    st.session_state.messages.append(
-                        {"role": "assistant", "content": last_assistant_response}
-                    )
-            except openai.error.APIError as e:
-                st.error(f"OpenAI API error: {e}")
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
+        if last_assistant_response:
+            # Update the last assistant response in the chat history
+            st.session_state.messages.append(
+                {"role": "assistant", "content": last_assistant_response}
+            )
 
     # Display the chat history in the container
     with chat_container:
