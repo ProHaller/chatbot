@@ -53,7 +53,7 @@ def main():
 
     chat_container = st.container()
 
-    user_input = st.chat_input("You:", placeholder="Type your message here...")
+    user_input = st.chat_input("You:")
 
     if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
