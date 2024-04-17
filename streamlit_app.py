@@ -94,26 +94,27 @@ def main():
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": user_input})
 
-        # Send user input to the chatbot and get response
-        run = wait_on_run(send_and_run(user_input))
-        response = get_response()
+        with st.spinner("Waiting for response..."):
+            # Send user input to the chatbot and get response
+            run = wait_on_run(send_and_run(user_input))
+            response = get_response()
 
-        # Find the last assistant response
-        last_assistant_response = None
-        for message in reversed(response.data):
-            if message.role == "assistant":
-                for content in message.content:
-                    if content.type == "text":
-                        last_assistant_response = content.text.value
-                        break
+            # Find the last assistant response
+            last_assistant_response = None
+            for message in reversed(response.data):
+                if message.role == "assistant":
+                    for content in message.content:
+                        if content.type == "text":
+                            last_assistant_response = content.text.value
+                            break
+                if last_assistant_response:
+                    break
+
             if last_assistant_response:
-                break
-
-        if last_assistant_response:
-            # Update the last assistant response in the chat history
-            st.session_state.messages.append(
-                {"role": "assistant", "content": last_assistant_response}
-            )
+                # Update the last assistant response in the chat history
+                st.session_state.messages.append(
+                    {"role": "assistant", "content": last_assistant_response}
+                )
 
     # Display the chat history in the container
     with chat_container:
